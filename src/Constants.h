@@ -8,7 +8,7 @@ const static char *APP_VERSION = "v0.01 (C) Antoine Grondin, 2012";
 // Configuration
 const static bool DEBUG = false;
 const static bool TEST = true;
-const static int BODY_COUNT = 2;
+const static int BODY_COUNT = 3;
 
 // GUI constants
 const static int APP_WIDTH = 800;

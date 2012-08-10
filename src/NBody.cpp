@@ -14,7 +14,8 @@ using std::cout; using std::cerr; using std::endl;
 // Setup
 
 int main(int argc, char **argv){
-   if(D) cout << ":main";
+
+   printGreetings();
 
    if(TEST){
       if( !testVectorMath() ){
@@ -25,8 +26,6 @@ int main(int argc, char **argv){
       cout << "All test OK" << endl;
    }
 
-
-   printGreetings();
    setupWindow(argc, argv);
    registerCallbacks();
 
@@ -41,29 +40,28 @@ int main(int argc, char **argv){
 
    setupRenderContext();
    glutMainLoop();
-   if(D) cout << " done" << endl;
    return 0;
 }
 
 void setupWindow(int argc, char **argv){
-   if(D) cout << ":setupWindow";
    gltSetWorkingDirectory( argv[0] );
    glutInit(&argc, argv);
    glutInitDisplayMode( GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH );
    glutInitWindowSize( APP_WIDTH, APP_HEIGHT );
    glutCreateWindow( APP_NAME );
-   if(D) cout << " done" << endl;
+
+   glutMouseFunc( onMouseEvent );
+   //glutIgnoreKeyRepeat(true);
+
 }
 
 void registerCallbacks(){
-   if(D) cout << ":registerCallbacks";
    glutReshapeFunc( onChangeSize );
    glutDisplayFunc( onRenderScene );
-   if(D) cout << " done" << endl;
+
 }
 
 void setupRenderContext(){
-   if(D) cout << ":setupRenderContext";
    sShaderManager.InitializeStockShaders();
    glEnable( GL_DEPTH_TEST );
    setupBodies();
@@ -75,24 +73,22 @@ void setupRenderContext(){
             sBackgroundColor[3] );
 
    glEnable( GL_LINE_SMOOTH );
-   if(D) cout << " done" << endl;
 
 }
 
 void setupBodies(){
-   if(D) cout << ":setupBodies";
    gltMakeSphere( sBodyBatch, sBodyRadius, 20, 40 );
    for( int i = 0; i < BODY_COUNT; i++ ){
-      sBodyFrames[i].SetOrigin( sBodyPosition[i] );
+      sBodyFrames[i].SetOrigin( sBodyPosition[i].x,
+               sBodyPosition[i].y,
+               sBodyPosition[i].z );
    }
-   if(D) cout << " done" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Callbacks
 
 void onChangeSize(int aNewWidth, int aNewHeight){
-   if(D) cout << ":onChangeSize";
    glViewport(0,0,aNewWidth, aNewHeight);
    sViewFrustrum.SetPerspective( APP_CAMERA_FOV,
             float( aNewWidth ) / float( aNewHeight ),
@@ -102,11 +98,9 @@ void onChangeSize(int aNewWidth, int aNewHeight){
             sViewFrustrum.GetProjectionMatrix() );
    sTransformPipeline.SetMatrixStacks(sModelViewMatrixStack,
             sProjectionMatrixStack);
-   if(D) cout << " done" << endl;
 }
 
 void onRenderScene(void){
-   if(D) cout << ":onRenderScene";
    // Clear the buffer
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
@@ -124,28 +118,73 @@ void onRenderScene(void){
    m3dTransformVector4( lightEyePos, lightPos, mCamera );
 
    // Call the drawing functions
-   drawBody( &timeKeeper, lightPos );
+   drawBodies( &timeKeeper, &lightEyePos );
 
    // Switch the buffers to bring the drawing on screen
    glutSwapBuffers();
    glutPostRedisplay();
-   if(D) cout << " done" << endl;
+
+}
+
+/**
+ * Called every time there is a button clicked by the mouse.
+ * @param button
+ * @param isReleased is 0 if button is pressed, 1 if button is released
+ * @param x,y are relative to the top-left corner of the window
+ * (not the screen)
+ */
+static void onMouseEvent(int button, int isReleased, int x, int y){
+   const static int LEFT_BTN = 0;
+   const static int RIGHT_BTN = 2;
+   const static int WHEEL_UP = 3;
+   const static int WHEEL_DOWN = 4;
+   switch (button) {
+      case LEFT_BTN:
+         cout << "Left button ";
+         break;
+      case RIGHT_BTN:
+         cout << "Right button ";
+         break;
+      case WHEEL_UP:
+         cout << "Wheel up ";
+         break;
+      case WHEEL_DOWN:
+         cout << "Wheel down ";
+         break;
+      default:
+         cout << "Unknown key ";
+         return;
+   }
+
+   if( isReleased ){
+      cout << "released";
+   } else {
+      cout << "pressed";
+   }
+
+   cout << endl;
 
 }
 
 ///////////////////////////////////////////////////////////////////////
 // Drawing
 
-void drawBody( CStopWatch *timeKeeper, M3DVector4f lightPosition ){
-   if(D) cout << ":drawBody";
+void drawBodies( CStopWatch *timeKeeper, M3DVector4f *lightPosition ){
+
    // compute displacement and new vectors
+   static float previousTime = 0.0f;
+   float currentTime = timeKeeper->GetElapsedSeconds();
+   updatePhysics( currentTime - previousTime );
+   previousTime = currentTime;
 
    for(int i = 0; i < BODY_COUNT; i++){
       // Save
       sModelViewMatrixStack.PushMatrix();
 
       // update position with regard to new values
-
+      sBodyFrames[i].SetOrigin( sBodyPosition[i].x,
+               sBodyPosition[i].y,
+               sBodyPosition[i].z );
       // draw
       sModelViewMatrixStack.MultMatrix( sBodyFrames[i] );
       sShaderManager.UseStockShader( GLT_SHADER_POINT_LIGHT_DIFF,
@@ -159,5 +198,75 @@ void drawBody( CStopWatch *timeKeeper, M3DVector4f lightPosition ){
       sModelViewMatrixStack.PopMatrix();
    }
 
-   if(D) cout << " done" << endl;
 }
+
+///////////////////////////////////////////////////////////////////////
+// Physics
+
+void updatePhysics(float deltaT){
+
+   for(int i = 0; i < BODY_COUNT; i++){
+      updateAcceleration(i);
+      updateVelocity(i, deltaT);
+      updatePosition(i, deltaT);
+   }
+
+   if(D) {
+      double firstAccel = magnitude(sBodyAcceleration[0]);
+      double firstVelo = magnitude(sBodyVelocity[0]);
+      double secondAccel = magnitude(sBodyAcceleration[1]);
+      double secondVelo = magnitude(sBodyVelocity[1]);
+
+      cout << "1st: accel=" << firstAccel << " velo=" << firstVelo;
+      cout << " || 2st: accel=" << secondAccel << " velo=" << secondVelo;
+      cout << endl;
+   }
+
+}
+
+void updateAcceleration(int bodyIndex){
+
+   Force3D netForce = { 0, 0, 0 };
+
+   for(int i = 0; i < BODY_COUNT; i++ ){
+      if( i == bodyIndex ) continue;
+
+      Force3D vectorForceToOther = {0,0,0};
+
+      Force scalarForceBetween = forceNewtonianGravity3D(
+               sBodyMass[bodyIndex], sBodyMass[i],
+               sBodyPosition[bodyIndex], sBodyPosition[i]);
+
+      direction(sBodyPosition[bodyIndex],
+               sBodyPosition[i],
+               vectorForceToOther);
+
+      vectorForceToOther.x *= scalarForceBetween;
+      vectorForceToOther.y *= scalarForceBetween;
+      vectorForceToOther.z *= scalarForceBetween;
+
+      netForce.x += vectorForceToOther.x;
+      netForce.y += vectorForceToOther.y;
+      netForce.z += vectorForceToOther.z;
+
+   }
+
+   sBodyAcceleration[bodyIndex] = computeAccel3D(sBodyMass[bodyIndex],
+            netForce);
+
+}
+
+void updateVelocity(int bodyIndex, float deltaT){
+   sBodyVelocity[bodyIndex] = computeVelo3D(
+            sBodyAcceleration[bodyIndex],
+            sBodyVelocity[bodyIndex],
+            deltaT );
+}
+
+void updatePosition(int bodyIndex, float deltaT){
+
+   sBodyPosition[bodyIndex] = computePos3D(sBodyVelocity[bodyIndex],
+            sBodyPosition[bodyIndex],
+            deltaT);
+}
+
