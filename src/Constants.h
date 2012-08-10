@@ -11,7 +11,7 @@ const static char *APP_CONTACT = "antoinegrondin@gmail.com";
 // Configuration
 const static bool DEBUG = false;
 const static bool TEST = true;
-const static int BODY_COUNT = 4;
+const static int BODY_COUNT = 6;
 
 // GUI constants
 const static int APP_WIDTH = 800;

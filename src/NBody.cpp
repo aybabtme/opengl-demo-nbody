@@ -56,6 +56,7 @@ void setupWindow( int argc, char **argv ) {
    glutCreateWindow( APP_NAME );
    glutMouseFunc( onMouseEvent );
    //glutIgnoreKeyRepeat(true);
+   glutFullScreen();
 }
 
 void registerCallbacks() {
