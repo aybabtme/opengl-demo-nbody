@@ -46,36 +46,42 @@ const static M3DVector4f sMainLightPos = { 0.0f, 10.0f, 5.0f, 1.0f };
 static GLTriangleBatch sBodyBatch[BODY_COUNT];
 static GLFrame sBodyFrames[BODY_COUNT];
 const static GLfloat sBodyRadius[BODY_COUNT] = {
-         50.0f,
-         10.0f,
-         15.0f
+   50.0f,
+   10.0f,
+   15.0f,
+   5.0f
 };
 
 const static GLclampf sBodyColors[BODY_COUNT][4] = {
-         {0.8f, 0.8f, 0.1f, 1.0f},  // Red
-         {0.5f, 0.5f, 1.0f, 1.0f},   // Blue
-         {0.8f, 0.8f, 1.0f, 1.0f}   // Blue
+   {0.8f, 0.8f, 0.1f, 1.0f},  // Yellow
+   {0.5f, 0.5f, 1.0f, 1.0f},  // Blue
+   {0.8f, 0.8f, 1.0f, 1.0f},  // Light-blue
+   {0.8f, 1.0f, 0.8f, 1.0f}   // Light-green
 };
 
 static Position3D sBodyPosition[BODY_COUNT] = {
-         { 0.0f, 0.0f, -1000.0f },
-         { 0.0f, 200.0f, -1000.0f },
-         { -200.0f, 0.0f, -1000.0f }
+   { 0.0f, 0.0f, -1000.0f },
+   { 0.0f, 200.0f, -1000.0f },
+   { -200.0f, 0.0f, -1000.0f },
+   { 0.0f, 0.0f, -800.0f }
 };
 static Velocity3D sBodyVelocity[BODY_COUNT] = {
-         { 0.0f, 0.0f, 0.0f },
-         { -30.0f, -30.0f, -30.0f },
-         { 30.0f, 30.0f, 30.0f }
+   { 0.0f, 0.0f, 0.0f },
+   { -30.0f, -30.0f, -30.0f },
+   { 30.0f, 30.0f, 30.0f },
+   { 45.0f, -30.0f, 15.0f }
 };
 static Acceleration3D sBodyAcceleration[BODY_COUNT] = {
-         { 0.0f, 0.0f, 0.0f },
-         { 0.0f, 0.0f, 0.0f },
-         { 0.0f, 0.0f, 0.0f }
+   { 0.0f, 0.0f, 0.0f },
+   { 0.0f, 0.0f, 0.0f },
+   { 0.0f, 0.0f, 0.0f },
+   { 0.0f, 0.0f, 0.0f }
 };
 static GLfloat sBodyMass[BODY_COUNT] = {
-         1e16f,
-         1e1f,
-         1e1f
+   1e16f,
+   1e1f,
+   1e1f,
+   2e1f
 };
 
 
@@ -84,38 +90,37 @@ static GLfloat sBodyMass[BODY_COUNT] = {
 ///////////////////////////////////////////////////////////////////////
 
 // Setup
-void setupWindow(int argc, char **argv);
+void setupWindow( int argc, char **argv );
 void registerCallbacks();
 void setupRenderContext();
 void setupBodies();
 
 // Callbacks
-static void onChangeSize(int aNewWidth, int aNewHeight);
+static void onChangeSize( int aNewWidth, int aNewHeight );
 static void onRenderScene();
-static void onMouseEvent(int key, int x, int y, int something);
+static void onMouseEvent( int key, int x, int y, int something );
 
 // Drawing
 static void drawBodies( CStopWatch *timeKeeper,
-         M3DVector4f *lightPosition );
+                        M3DVector4f *lightPosition );
 
 // Physics
-static void updatePhysics(float deltaT);
-static void updateAcceleration(int bodyIndex);
-static void updateVelocity(int bodyIndex, float deltaT);
-static void updatePosition(int bodyIndex, float deltaT);
+static void updatePhysics( float deltaT );
+static void updateAcceleration( int bodyIndex );
+static void updateVelocity( int bodyIndex, float deltaT );
+static void updatePosition( int bodyIndex, float deltaT );
 
 // Misc
-inline void printGreetings(){
+inline void printGreetings() {
    std::cout << APP_NAME << " "
-            << APP_VERSION << std::endl;
-
+             << APP_VERSION << std::endl;
    std::cout << APP_COPYRIGHT
-            << ", licensed under "
-            << APP_LICENSE
-            << std::endl;
+             << ", licensed under "
+             << APP_LICENSE
+             << std::endl;
    std::cout << "Contact me at "
-            << APP_CONTACT
-            << std::endl;
+             << APP_CONTACT
+             << std::endl;
 }
 
 #endif
