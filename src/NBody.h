@@ -43,29 +43,38 @@ static GLFrame sCameraFrame;
 const static GLclampf sBackgroundColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 const static M3DVector4f sMainLightPos = { 0.0f, 10.0f, 5.0f, 1.0f };
 
-static GLTriangleBatch sBodyBatch;
+static GLTriangleBatch sBodyBatch[BODY_COUNT];
 static GLFrame sBodyFrames[BODY_COUNT];
-const static GLfloat sBodyRadius = 15.0f;
+const static GLfloat sBodyRadius[BODY_COUNT] = {
+         50.0f,
+         10.0f,
+         15.0f
+};
 
 const static GLclampf sBodyColors[BODY_COUNT][4] = {
-         {1.0f, 0.1f, 0.1f, 1.0f},  // Red
-         {0.5f, 0.5f, 1.0f, 1.0f}   // Blue
+         {0.8f, 0.8f, 0.1f, 1.0f},  // Red
+         {0.5f, 0.5f, 1.0f, 1.0f},   // Blue
+         {0.8f, 0.8f, 1.0f, 1.0f}   // Blue
 };
 
 static Position3D sBodyPosition[BODY_COUNT] = {
          { 0.0f, 0.0f, -1000.0f },
-         { 0.0f, 200.0f, -1000.0f }
+         { 0.0f, 200.0f, -1000.0f },
+         { -200.0f, 0.0f, -1000.0f }
 };
 static Velocity3D sBodyVelocity[BODY_COUNT] = {
          { 0.0f, 0.0f, 0.0f },
-         { -30.0f, 0.0f, 0.0f }
+         { -30.0f, -30.0f, -30.0f },
+         { 30.0f, 30.0f, 30.0f }
 };
 static Acceleration3D sBodyAcceleration[BODY_COUNT] = {
+         { 0.0f, 0.0f, 0.0f },
          { 0.0f, 0.0f, 0.0f },
          { 0.0f, 0.0f, 0.0f }
 };
 static GLfloat sBodyMass[BODY_COUNT] = {
          1e16f,
+         1e1f,
          1e1f
 };
 
@@ -97,7 +106,16 @@ static void updatePosition(int bodyIndex, float deltaT);
 
 // Misc
 inline void printGreetings(){
-   std::cout << APP_NAME << std::endl << APP_VERSION << std::endl;
+   std::cout << APP_NAME << " "
+            << APP_VERSION << std::endl;
+
+   std::cout << APP_COPYRIGHT
+            << ", licensed under "
+            << APP_LICENSE
+            << std::endl;
+   std::cout << "Contact me at "
+            << APP_CONTACT
+            << std::endl;
 }
 
 #endif

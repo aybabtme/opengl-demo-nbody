@@ -4,10 +4,8 @@
 #include <iostream>
 
 // Physics and math constants
-#define PI (3.141592653589f)
-#define G (6.67e-11f)
-
-
+const static double PI = 3.141592653589f;
+const static double G = 6.67e-11f;
 
 // Vectors
 typedef double Vector;

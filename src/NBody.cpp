@@ -77,8 +77,9 @@ void setupRenderContext(){
 }
 
 void setupBodies(){
-   gltMakeSphere( sBodyBatch, sBodyRadius, 20, 40 );
+
    for( int i = 0; i < BODY_COUNT; i++ ){
+      gltMakeSphere( sBodyBatch[i], sBodyRadius[i], 20, 40 );
       sBodyFrames[i].SetOrigin( sBodyPosition[i].x,
                sBodyPosition[i].y,
                sBodyPosition[i].z );
@@ -192,7 +193,7 @@ void drawBodies( CStopWatch *timeKeeper, M3DVector4f *lightPosition ){
                sTransformPipeline.GetProjectionMatrix(),
                lightPosition,
                sBodyColors[i]);
-      sBodyBatch.Draw();
+      sBodyBatch[i].Draw();
 
       // Restore
       sModelViewMatrixStack.PopMatrix();
