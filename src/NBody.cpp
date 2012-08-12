@@ -77,7 +77,7 @@ void setupRenderContext() {
 
 void setupBodies() {
    for( int i = 0; i < BODY_COUNT; i++ ) {
-      gltMakeSphere( sBodyBatch[i], sBodyRadius[i], 20, 40 );
+      gltMakeSphere( sBodyBatch[i], sBodyRadius[i], 30, 50 );
       sBodyFrames[i].SetOrigin( sBodyPosition[i].x,
                                 sBodyPosition[i].y,
                                 sBodyPosition[i].z );

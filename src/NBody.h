@@ -11,7 +11,13 @@
 #include <iostream>
 #include <string>
 #include <GL/glew.h>
+
+#ifdef __APPLE__
+#include <glut/glut.h>
+#else
+#define FREEGLUT_STATIC
 #include <GL/freeglut.h>
+#endif
 
 // Project libs
 #include <GLTools.h>
