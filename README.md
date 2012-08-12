@@ -12,8 +12,7 @@ Makefile to see where `freeglut` can be installed.
 ``` shell
     cd opengl-demo-nbody
     make
-    ./n-body-sim    # runs the demo (will start in fullscreen, `alt+F4
-            to exit`)
+    ./n-body-sim    # runs the demo (will start in fullscreen, `alt+F4 to exit`)
 ```
 
 You can safely ignore the warnings (2 of them) produced.
